@@ -1,0 +1,36 @@
+# Raw data — contains patient identifiable information
+data/raw/
+data/processed/
+data/reference/
+*.MOV
+*.MP4
+*.mov
+*.mp4
+*.avi
+
+# Outputs that may contain patient names
+outputs/
+logs/
+*.xlsx
+*.xls
+
+# JSON keypoints (large + named by patient)
+*.json
+
+# Python cache
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+
+# Models
+models/
+*.pkl
+*.pt
+*.h5
+
+# Environment
+.env
+venv/
+.venv/
+notebooks_backup/

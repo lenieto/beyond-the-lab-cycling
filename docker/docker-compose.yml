@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  openpose:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./data:/data
+      - ./outputs:/outputs
+      - ./src:/src
+      - ./logs:/logs
+    working_dir: /openpose
