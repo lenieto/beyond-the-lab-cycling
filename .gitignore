@@ -34,3 +34,4 @@ models/
 venv/
 .venv/
 notebooks_backup/
+subject_mapping_local.json
