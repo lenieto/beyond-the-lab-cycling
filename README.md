@@ -1,238 +1,225 @@
-# Análisis Biomecánico con OpenPose
-**Universidad de los Andes · Semillero EMBS**
+# Beyond the Motion Lab: Low-Cost Fatigue Monitoring in Cycling
 
-Sistema de análisis de movimiento humano usando OpenPose para la detección de ángulos articulares en 2D y 3D.
+Universidad de los Andes, Departamento de Ingeniería Biomédica.
 
----
+Este repositorio contiene el código y los notebooks asociados al artículo *Beyond the Motion Lab: Low-Cost Fatigue Monitoring in Cycling via Deep Learning*. El proyecto propone una alternativa de bajo costo y sin marcadores para detectar fatiga en ciclistas a partir de video del plano sagital, combinando OpenPose para estimación de pose con un pipeline de clasificación supervisada (LSTM, LSTM con atención y XGBoost).
 
-## Contenido del proyecto
+Todo el análisis es bidimensional y está enfocado en el plano sagital izquierdo. No se incluye análisis 3D en esta versión.
+
+## Contenido del repositorio
+
+Cuando descargas el repositorio desde GitHub como ZIP, la carpeta se llama `beyond-the-lab-cycling-main`. Su contenido es el siguiente:
 
 ```
-openpose-workdir/
-├── README.md                 ← este archivo
-├── Dockerfile                ← imagen Docker de OpenPose
-├── openpose_core.py          ← motor central de análisis
-├── openpose_app.py           ← interfaz gráfica profesional
-├── openpose_analisis.ipynb   ← notebook interactivo (VS Code)
-├── INPUT/                    ← coloca aquí tus videos
-└── OUTPUT/                   ← los resultados se guardan aquí
+beyond-the-lab-cycling-main/
+├── docker/                   configuración para construir la imagen de OpenPose
+├── notebooks/                cuadernos de análisis y entrenamiento de modelos
+├── src/                      scripts de Python para el pipeline de procesamiento
+├── .gitignore
+└── README.md
 ```
 
----
+Las carpetas `data/` y `outputs/` no están versionadas porque contienen videos y resultados de los participantes del estudio. El usuario debe crearlas manualmente al usar el sistema con sus propios datos, como se explica más adelante.
+
+### Estructura recomendada al trabajar localmente
+
+Una vez descomprimido el ZIP, conviene crear las carpetas de trabajo dentro del proyecto:
+
+```
+beyond-the-lab-cycling-main/
+├── docker/
+├── notebooks/
+├── src/
+├── data/
+│   └── raw/                  aquí van los videos en .MOV o .MP4
+├── outputs/                  aquí se guardan los resultados por sujeto
+│   ├── figures/
+│   ├── metrics/
+│   └── models/
+├── .gitignore
+└── README.md
+```
+
+En macOS o Linux:
+
+```bash
+cd beyond-the-lab-cycling-main
+mkdir -p data/raw outputs/figures outputs/metrics outputs/models
+```
+
+En Windows (PowerShell):
+
+```powershell
+cd beyond-the-lab-cycling-main
+mkdir data\raw, outputs\figures, outputs\metrics, outputs\models
+```
 
 ## Requisitos previos
 
-### Python
-- Python 3.10 o superior
-- Descarga en: https://www.python.org/downloads/
+Para correr el pipeline completo se necesitan tres cosas: una versión reciente de Python, las dependencias de Python listadas más abajo, y Docker Desktop con la imagen de OpenPose construida localmente.
 
-### Dependencias Python
-Ejecuta este comando en la terminal una sola vez:
+### Python
+
+Se requiere Python 3.10 o superior. Si no lo tienes instalado, puedes descargarlo desde [python.org](https://www.python.org/downloads/).
+
+### Dependencias de Python
+
+Desde la raíz del proyecto, instala los paquetes necesarios:
 
 ```bash
-pip install PyQt6 opencv-python pandas openpyxl matplotlib ipywidgets tqdm
+pip install PyQt6 opencv-python pandas openpyxl matplotlib ipywidgets tqdm numpy scipy scikit-learn torch xgboost tsfel
 ```
 
+`torch` y `xgboost` son necesarios para los notebooks de entrenamiento. `tsfel` se usa para la extracción de características en el pipeline de XGBoost.
+
 ### Docker Desktop
-OpenPose corre dentro de un contenedor Docker para garantizar compatibilidad en cualquier computador.
 
----
+OpenPose se ejecuta dentro de un contenedor Docker para evitar problemas de compatibilidad entre sistemas operativos.
 
-## Instalación de Docker
+#### Instalación en macOS
 
-### macOS
+1. Entra a [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/) y descarga Docker Desktop para Mac. Si tu equipo tiene chip Apple Silicon (M1, M2, M3, M4), elige esa versión. Si es Intel, descarga la versión correspondiente.
+2. Abre el `.dmg` y arrastra Docker a la carpeta Aplicaciones.
+3. Abre Docker desde Aplicaciones y acepta los permisos que solicita.
+4. Espera a que el ícono de la barra superior se quede estático, lo que indica que el motor de Docker está corriendo.
 
-1. Ve a https://www.docker.com/products/docker-desktop/
-2. Descarga Docker Desktop para Mac
-   - Si tu Mac tiene chip M1/M2/M3/M4 → descarga **Apple Silicon**
-   - Si tu Mac es Intel → descarga **Intel Chip**
-3. Abre el archivo `.dmg` descargado
-4. Arrastra Docker a la carpeta **Aplicaciones**
-5. Abre Docker desde Aplicaciones
-6. Acepta los permisos que solicite
-7. Espera a que el ícono 🐳 en la barra superior deje de moverse
+Para verificar que la instalación fue exitosa, en una terminal:
 
-Verifica la instalación en la terminal:
 ```bash
 docker --version
 ```
-Deberías ver algo como: `Docker version 29.x.x`
 
----
+#### Instalación en Windows
 
-### Windows
+Primero hay que habilitar WSL2. En una PowerShell con permisos de administrador, ejecuta:
 
-**Paso 1 — Habilitar WSL2** (necesario para Docker en Windows):
-
-1. Abre **PowerShell como Administrador** (clic derecho → "Ejecutar como administrador")
-2. Ejecuta:
 ```powershell
 wsl --install
 ```
-3. Reinicia el computador
 
-**Paso 2 — Instalar Docker Desktop:**
+Reinicia el computador después de que termine la instalación. Luego descarga Docker Desktop desde la misma página, ejecuta el instalador `.exe` y, durante la instalación, deja marcada la opción "Use WSL2 instead of Hyper-V". Reinicia de nuevo y abre Docker Desktop. Espera a que aparezca el mensaje "Engine running" en la esquina inferior izquierda.
 
-1. Ve a https://www.docker.com/products/docker-desktop/
-2. Descarga Docker Desktop para Windows
-3. Ejecuta el instalador `.exe`
-4. Durante la instalación, asegúrate de marcar **"Use WSL2 instead of Hyper-V"**
-5. Reinicia el computador
-6. Abre Docker Desktop desde el menú inicio
-7. Espera a que aparezca **"Engine running"** en la esquina inferior izquierda
+Verifica la instalación:
 
-Verifica la instalación en PowerShell:
 ```powershell
 docker --version
 ```
 
----
+## Construcción de la imagen de OpenPose
 
-## Construir la imagen de OpenPose
+Este paso se realiza una sola vez y puede tardar entre 30 y 60 minutos dependiendo de la conexión y del equipo. Posiciónate en la carpeta del proyecto antes de ejecutar el comando.
 
-Este paso solo se hace **una vez**. Tarda entre 30 y 60 minutos.
+En macOS o Linux:
 
-### macOS
 ```bash
-cd ~/Downloads/openpose-workdir
-docker build --platform linux/amd64 -t openpose-local .
+cd beyond-the-lab-cycling-main
+docker build --platform linux/amd64 -t openpose-local ./docker
 ```
 
-### Windows (PowerShell)
+En Windows (PowerShell):
+
 ```powershell
-cd $HOME\Downloads\openpose-workdir
-docker build --platform linux/amd64 -t openpose-local .
+cd beyond-the-lab-cycling-main
+docker build --platform linux/amd64 -t openpose-local .\docker
 ```
 
-Cuando termine verás el mensaje:
+Cuando termine, deberías ver una línea similar a:
+
 ```
-Successfully built ...
 Successfully tagged openpose-local:latest
 ```
 
----
-
 ## Cómo usar el sistema
 
-### Opción 1 — Interfaz gráfica (recomendada para uso hospitalario)
+El flujo de trabajo tiene dos etapas claramente separadas. La primera convierte videos en series de ángulos articulares filtrados. La segunda toma esas series como entrada para entrenar y comparar los clasificadores de fatiga.
+
+### Etapa 1: procesamiento de video con OpenPose
+
+Coloca los videos en `data/raw/` siguiendo la convención `Sujeto_Condicion.MOV` (por ejemplo, `P1_Inicial.MOV` y `P1_Fatiga.MOV`). Los videos deben grabarse del lado izquierdo del ciclista, en plano sagital.
+
+Hay dos formas de procesarlos:
+
+#### Opción A: interfaz gráfica
 
 ```bash
-# macOS
-python3 ~/Downloads/openpose-workdir/openpose_app.py
-
-# Windows (PowerShell)
-python $HOME\Downloads\openpose-workdir\openpose_app.py
+python3 src/openpose_app.py
 ```
 
-**Flujo de uso:**
-1. Selecciona el idioma (Español / English)
-2. Agrega uno o varios videos usando el botón o arrastrándolos
-3. Presiona **Analizar**
-4. La barra de progreso muestra el avance en tiempo real
-5. Al terminar, aparece una tarjeta con las rutas de todos los resultados
+En Windows:
 
-### Opción 2 — Notebook interactivo (para investigación)
+```powershell
+python src\openpose_app.py
+```
 
-1. Abre VS Code
-2. Abre el archivo `openpose_analisis.ipynb`
-3. Corre las celdas en orden de arriba hacia abajo
-4. La Celda 1 verifica Docker automáticamente
-5. La Celda 2 te permite configurar el video y el nombre del ejercicio
+La interfaz permite cargar uno o varios videos arrastrándolos, identificar el sujeto y la condición, y lanzar el análisis. Una barra de progreso muestra el avance frame a frame. Al terminar, cada video genera una subcarpeta en `outputs/` con el video con esqueleto sobrepuesto, un Excel de ángulos y la carpeta con los JSON de OpenPose.
 
----
+#### Opción B: script directo desde Python
+
+Si prefieres procesar los videos sin GUI, puedes importar las funciones de `src/openpose_core.py` desde un notebook o script propio. Las funciones expuestas se documentan al final del archivo.
+
+### Etapa 2: análisis de ángulos y entrenamiento de modelos
+
+Los notebooks en `notebooks/` toman como entrada las carpetas generadas por la etapa anterior y producen las figuras y tablas del paper. El orden recomendado es el siguiente.
+
+| Notebook | Propósito |
+|---|---|
+| `openpose_analisis.ipynb` | Carga los JSON de cada sujeto, calcula los cuatro ángulos articulares (rodilla, cadera, tobillo, tronco), aplica el filtro Butterworth de paso bajo (6 Hz, orden 4, fase cero) y genera las series por ciclo de pedaleo. |
+| `tsfel_features_extraction.ipynb` | Extrae características estadísticas y espectrales de las series de ángulos usando TSFEL, para alimentar a XGBoost. |
+| `xgboost_training.ipynb` | Entrena el clasificador XGBoost bajo el esquema de validación leave-one-subject-out. |
+| `dl_fatiga_lstm.ipynb` | Entrena las dos variantes de LSTM (con y sin atención) bajo el mismo esquema de validación. |
+| `lstm_vs_xgboost_comparison.ipynb` | Compara las tres aproximaciones y genera las tablas comparativas y la matriz de confusión reportadas en el paper. |
+
+En todos los notebooks los sujetos se referencian con códigos anónimos (P1 a P5). Si quieres analizar tus propios datos, basta con que las carpetas en `outputs/` sigan la nomenclatura `Sujeto_Condicion`.
 
 ## Resultados generados
 
-Por cada video analizado, el sistema genera una subcarpeta en `OUTPUT/` con:
+Por cada video procesado, el sistema crea una subcarpeta en `outputs/` con los siguientes archivos:
 
 | Archivo | Descripción |
 |---|---|
-| `*_skeleton.mp4` | Video original con el esqueleto de 25 puntos articulares superpuesto |
-| `*_angles.xlsx` | Ángulos articulares por frame en Excel (dos hojas: datos y estadísticas) |
-| `*_charts.png` | Gráficas de todos los ángulos a lo largo del tiempo |
-| `json/` | Carpeta con un archivo `.json` por cada frame del video |
+| `*_skeleton.mp4` | Video original con el esqueleto BODY_25 sobrepuesto. |
+| `*_angles.xlsx` | Excel con dos hojas: una con los ángulos por frame y otra con estadísticas descriptivas. |
+| `*_charts.png` | Gráficas de los ángulos a lo largo del tiempo o del ciclo de pedaleo. |
+| `json/` | Una carpeta con un archivo JSON por frame, en el formato nativo de OpenPose. |
 
-### Articulaciones detectadas (modelo BODY_25)
+Los notebooks de análisis agregan en `outputs/figures/`, `outputs/metrics/` y `outputs/models/` las figuras finales, las tablas con métricas de rendimiento y los pesos entrenados de los modelos.
 
-| Articulación | Puntos usados |
+## Articulaciones analizadas
+
+El estudio se restringe al plano sagital izquierdo. Los ángulos calculados a partir del modelo BODY_25 de OpenPose son los siguientes:
+
+| Articulación | Keypoints utilizados |
 |---|---|
-| Codo derecho | Hombro D → Codo D → Muñeca D |
-| Codo izquierdo | Hombro I → Codo I → Muñeca I |
-| Rodilla derecha | Cadera D → Rodilla D → Tobillo D |
-| Rodilla izquierda | Cadera I → Rodilla I → Tobillo I |
-| Cadera derecha | Cuello → Cadera D → Rodilla D |
-| Cadera izquierda | Cuello → Cadera I → Rodilla I |
-| Hombro derecho | Cuello → Hombro D → Codo D |
-| Hombro izquierdo | Cuello → Hombro I → Codo I |
-
----
-
-## Análisis 3D (dos cámaras)
-
-Para ejercicios que involucran rotación o movimiento fuera del plano frontal, el sistema soporta análisis con dos cámaras sincronizadas.
-
-### Requisitos
-- 2 cámaras (iPhones, cámaras web, etc.)
-- Las cámaras deben estar a **90° entre sí** (una frontal, una lateral)
-- Los videos deben estar sincronizados mediante un punto de referencia común (por ejemplo, un aplauso al inicio)
-
-### Pasos
-1. Graba ambos videos simultáneamente
-2. Procesa cada video por separado con OpenPose (genera dos carpetas de JSON)
-3. Usa el script de triangulación incluido en el notebook para calcular coordenadas 3D
-
-### Ejercicios que requieren análisis 3D
-- Rotación interna y externa de hombro
-- Elevación en plano escapular (scaption)
-- Extensión de hombro
-- Zancada lateral
-
----
+| Rodilla izquierda | KP12, KP13, KP14 |
+| Cadera izquierda | KP1, KP12, KP13 |
+| Tobillo izquierdo | KP13, KP14, KP19 |
+| Tronco | Segmento KP5 a KP12 medido contra la vertical |
 
 ## Solución de problemas frecuentes
 
-### "Cannot connect to the Docker daemon"
-Docker no está abierto. Abre Docker Desktop y espera a que el ícono deje de moverse.
+**El sistema dice "Cannot connect to the Docker daemon".** Docker Desktop no está abierto. Ábrelo y espera a que el motor termine de iniciar antes de volver a correr el análisis.
 
-### "No such image: openpose-local"
-La imagen no ha sido construida. Ejecuta el comando `docker build` de la sección anterior.
+**El sistema dice "No such image: openpose-local".** La imagen no se ha construido todavía. Vuelve a la sección de construcción de la imagen y ejecuta el comando `docker build`.
 
-### El video de salida dura menos de 1 segundo o se ve verde
-El proceso de Docker fue interrumpido antes de terminar. Vuelve a correr el análisis sin interrumpir.
+**El video de salida dura menos de un segundo o se ve verde.** El contenedor de Docker fue interrumpido antes de terminar de procesar. Asegúrate de no cerrar la terminal ni Docker Desktop durante el procesamiento.
 
-### El archivo Excel no tiene datos de ángulos
-Verifica que los archivos JSON en `OUTPUT/nombre_video/json/` existan y no estén vacíos.
+**El Excel sale vacío o sin columnas de ángulos.** Confirma que los archivos JSON en `outputs/Sujeto_Condicion/json/` se generaron correctamente y no están vacíos. Si lo están, el contenedor de OpenPose no terminó.
 
-### "zsh: command not found: code" (macOS)
-Abre VS Code, presiona `Cmd+Shift+P`, busca **"Shell Command: Install 'code' command in PATH"** y ejecútalo.
+**En macOS aparece "zsh: command not found: code".** Abre VS Code, presiona Cmd+Shift+P, busca "Shell Command: Install 'code' command in PATH" y ejecútalo.
 
----
+## Autores
 
-## Estructura del código
+Luis Esteban Nieto Marquez (le.nieto@uniandes.edu.co), Gabriela Osorio Garzón (g.osoriog@uniandes.edu.co), Christian Cifuentes-De la Portilla, Nathalia Ortega, y Luis Felipe Giraldo.
+
+Para preguntas, problemas de instalación o colaboraciones, escribir a Luis Esteban Nieto Marquez o a Gabriela Osorio Garzón.
+
+## Cita
+
+Si usas este código o construyes sobre este trabajo, por favor cita el artículo asociado:
 
 ```
-openpose_core.py
-│
-├── check_docker()              → verifica que Docker esté corriendo
-├── check_openpose_image()      → verifica que la imagen exista
-├── get_frame_count()           → obtiene frames y FPS de un video
-├── run_openpose()              → ejecuta OpenPose en Docker con progreso
-├── json_to_dataframe()         → convierte JSON de OpenPose a DataFrame
-├── dataframe_to_excel()        → exporta DataFrame a Excel formateado
-├── make_angle_charts()         → genera gráficas PNG de los ángulos
-└── open_path()                 → abre carpeta en Finder/Explorador
+L. E. Nieto Marquez, G. Osorio Garzón, C. Cifuentes-De la Portilla,
+N. Ortega y L. F. Giraldo, "Beyond the Motion Lab: Low-Cost Fatigue
+Monitoring in Cycling via Deep Learning," IEEE Colombian Conference
+on Applications of Computational Intelligence (ColCACI), 2026.
 ```
-
----
-
-## Información del proyecto
-
-- **Institución:** Universidad de los Andes, Bogotá, Colombia
-- **Semillero:** EMBS — Engineering in Medicine and Biology Society
-- **Herramienta base:** OpenPose (Carnegie Mellon University)
-- **Modelo de detección:** BODY_25 (25 puntos articulares)
-- **Modo de ejecución:** CPU (compatible con cualquier computador)
-
----
-
-*Para soporte técnico o preguntas sobre el proyecto, contactar al semillero EMBS.*
