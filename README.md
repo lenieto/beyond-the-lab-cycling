@@ -215,11 +215,5 @@ Para preguntas, problemas de instalación o colaboraciones, escribir a Luis Este
 
 ## Cita - PENDIENTE!!! PILAS
 
-Si usas este código o construyes sobre este trabajo, por favor cita el artículo asociado:
-
-```
-L. E. Nieto Marquez, G. Osorio Garzón, C. Cifuentes-De la Portilla,
-N. Ortega y L. F. Giraldo, "Beyond the Motion Lab: Low-Cost Fatigue
-Monitoring in Cycling via Deep Learning," IEEE Colombian Conference
-on Applications of Computational Intelligence (ColCACI), 2026.
+Si usas este código o construyes sobre este trabajo, por favor cita... si lo del artículo de COLCACI se logra publicar pues adjuntarlo aquí
 ```
