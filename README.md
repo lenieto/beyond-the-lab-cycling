@@ -213,7 +213,7 @@ Luis Esteban Nieto Marquez (le.nieto@uniandes.edu.co), Gabriela Osorio Garzón (
 
 Para preguntas, problemas de instalación o colaboraciones, escribir a Luis Esteban Nieto Marquez o a Gabriela Osorio Garzón.
 
-## Cita
+## Cita - PENDIENTE!!! PILAS
 
 Si usas este código o construyes sobre este trabajo, por favor cita el artículo asociado:
 
