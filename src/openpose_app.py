@@ -28,23 +28,23 @@ from PyQt6.QtGui import QColor, QFont, QLinearGradient, QPalette, QIcon, QPixmap
  
 #colores
 C = {
-    "bg":        "#0a0f14",
-    "surface":   "#0d1520",
-    "surface2":  "#112030",
-    "surface3":  "#163050",
-    "border":    "#1a3a5c",
-    "border2":   "#1e4a6e",
-    "accent":    "#00a3e0",
-    "accent2":   "#0099cc",
-    "accent3":   "#78be20",
-    "warn":      "#f5a623",
-    "error":     "#cc2244",
-    "success":   "#78be20",
-    "text":      "#F0F2F5",
-    "text2":     "#8892A4",
-    "text3":     "#4A5568",
-    "blue":      "#00629b",
-    "purple":    "#772583",
+    "bg": "#0a0f14",
+    "surface": "#0d1520",
+    "surface2": "#112030",
+    "surface3": "#163050",
+    "border": "#1a3a5c",
+    "border2": "#1e4a6e",
+    "accent": "#00a3e0",
+    "accent2": "#0099cc",
+    "accent3": "#78be20",
+    "warn": "#f5a623",
+    "error": "#cc2244",
+    "success": "#78be20",
+    "text": "#F0F2F5",
+    "text2": "#8892A4",
+    "text3": "#4A5568",
+    "blue": "#00629b",
+    "purple": "#772583",
 }
  
 STYLE = f"""
@@ -213,71 +213,71 @@ QFrame#sidebar {{
  
 LANGS = {
     "ES": {
-        "app_title":      "Análisis Biomecánico - Ciclismo",
-        "subtitle":       "OpenPose - Universidad de los Andes",
-        "authors":        "Luis Nieto & Gabriela Osorio",
-        "lang_label":     "Idioma",
-        "add_videos":     "Agregar Videos",
-        "clear_list":     "Limpiar",
-        "analyze":        "Iniciar Análisis",
-        "select_hint":    "Arrastra videos aquí o usa el botón",
-        "results_title":  "Resultados",
-        "video_result":   "Video con esqueleto",
-        "excel_result":   "Ángulos articulares",
-        "chart_result":   "Gráficas",
-        "json_result":    "JSON por frame",
-        "open_btn":       "Abrir",
-        "status_ready":   "Listo",
+        "app_title": "Análisis Biomecánico: Ciclismo",
+        "subtitle": "OpenPose - Universidad de los Andes",
+        "authors": "Luis Nieto & Gabriela Osorio",
+        "lang_label": "Idioma",
+        "add_videos": "Agregar Videos",
+        "clear_list": "Limpiar",
+        "analyze": "Iniciar Análisis",
+        "select_hint": "Arrastra videos aquí o usa el botón",
+        "results_title": "Resultados",
+        "video_result": "Video con esqueleto",
+        "excel_result": "Ángulos articulares",
+        "chart_result": "Gráficas",
+        "json_result": "JSON por frame",
+        "open_btn": "Abrir",
+        "status_ready": "Listo",
         "status_running": "Procesando…",
-        "status_done":    "Análisis completado",
-        "status_error":   "Error en el análisis",
-        "frames_label":   "frames",
-        "queue_label":    "Cola",
+        "status_done": "Análisis completado",
+        "status_error": "Error en el análisis",
+        "frames_label": "frames",
+        "queue_label": "Cola",
         "progress_label": "Progreso",
-        "no_videos":      "No hay videos en la lista",
-        "docker_error":   "Docker no disponible",
-        "check_docker":   "Verificando Docker…",
-        "folder_label":   "Carpeta",
-        "empty_hint":     "Los resultados aparecerán aquí",
+        "no_videos": "No hay videos en la lista",
+        "docker_error": "Docker no disponible",
+        "check_docker": "Verificando Docker…",
+        "folder_label": "Carpeta",
+        "empty_hint": "Los resultados aparecerán aquí",
     },
     "EN": {
-        "app_title":      "Biomechanical Analysis · Cycling",
-        "subtitle":       "OpenPose - Universidad de los Andes",
-        "authors":        "Luis Nieto & Gabriela Osorio",
-        "lang_label":     "Language",
-        "add_videos":     "Add Videos",
-        "clear_list":     "Clear",
-        "analyze":        "Start Analysis",
-        "select_hint":    "Drag videos here or use the button",
-        "results_title":  "Results",
-        "video_result":   "Skeleton video",
-        "excel_result":   "Joint angles",
-        "chart_result":   "Charts",
-        "json_result":    "JSON per frame",
-        "open_btn":       "Open",
-        "status_ready":   "Ready",
+        "app_title": "Biomechanical Analysis: Cycling",
+        "subtitle": "OpenPose - Universidad de los Andes",
+        "authors": "Luis Nieto & Gabriela Osorio",
+        "lang_label": "Language",
+        "add_videos": "Add Videos",
+        "clear_list": "Clear",
+        "analyze": "Start Analysis",
+        "select_hint": "Drag videos here or use the button",
+        "results_title": "Results",
+        "video_result": "Skeleton video",
+        "excel_result": "Joint angles",
+        "chart_result": "Charts",
+        "json_result": "JSON per frame",
+        "open_btn": "Open",
+        "status_ready": "Ready",
         "status_running": "Processing…",
-        "status_done":    "Analysis complete",
-        "status_error":   "Analysis error",
-        "frames_label":   "frames",
-        "queue_label":    "Queue",
+        "status_done": "Analysis complete",
+        "status_error": "Analysis error",
+        "frames_label": "frames",
+        "queue_label": "Queue",
         "progress_label": "Progress",
-        "no_videos":      "No videos in queue",
-        "docker_error":   "Docker not available",
-        "check_docker":   "Checking Docker…",
-        "folder_label":   "Folder",
-        "empty_hint":     "Results will appear here",
+        "no_videos": "No videos in queue",
+        "docker_error": "Docker not available",
+        "check_docker": "Checking Docker…",
+        "folder_label": "Folder",
+        "empty_hint": "Results will appear here",
     }
 }
  
  
 #Worker
 class AnalysisWorker(QThread):
-    progress      = pyqtSignal(int, int)
+    progress = pyqtSignal(int, int)
     status_update = pyqtSignal(str)
-    video_done    = pyqtSignal(dict)
-    all_done      = pyqtSignal()
-    error         = pyqtSignal(str)
+    video_done = pyqtSignal(dict)
+    all_done = pyqtSignal()
+    error = pyqtSignal(str)
  
     def __init__(self, paths):
         super().__init__()
@@ -754,7 +754,7 @@ class MainWindow(QMainWindow):
  
     def _on_video_done(self, result):
         card = ResultCard(result, lang=self.lang)
-        idx  = self.cards_layout.count() - 1
+        idx = self.cards_layout.count() - 1
         self.cards_layout.insertWidget(idx, card)
         self._result_count += 1
         self.results_count.setText(str(self._result_count))
@@ -785,7 +785,7 @@ class MainWindow(QMainWindow):
 #Entry point
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setApplicationName("OpenPose Biomechanics · Ciclismo")
+    app.setApplicationName("OpenPose Biomechanics: Ciclismo")
  
     # Fuente base
     font = QFont("SF Mono", 11)
