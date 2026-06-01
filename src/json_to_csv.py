@@ -48,15 +48,15 @@ with open(output_csv, "w", newline="") as csvfile:
 
         writer.writerow({
             "frame": i,
-            "codo_derecho":    calcular_angulo(p[2], p[3], p[4]),
-            "codo_izquierdo":  calcular_angulo(p[5], p[6], p[7]),
+            "codo_derecho": calcular_angulo(p[2], p[3], p[4]),
+            "codo_izquierdo": calcular_angulo(p[5], p[6], p[7]),
             "rodilla_derecha": calcular_angulo(p[9], p[10], p[11]),
             "rodilla_izquierda": calcular_angulo(p[12], p[13], p[14]),
-            "cadera_derecha":  calcular_angulo(p[1], p[9], p[10]),
+            "cadera_derecha": calcular_angulo(p[1], p[9], p[10]),
             "cadera_izquierda": calcular_angulo(p[1], p[12], p[13]),
-            "hombro_derecho":  calcular_angulo(p[1], p[2], p[3]),
+            "hombro_derecho": calcular_angulo(p[1], p[2], p[3]),
             "hombro_izquierdo": calcular_angulo(p[1], p[5], p[6]),
         })
 
-print(f"✓ CSV generado con {len(archivos)} frames")
-print(f"✓ Guardado en: {output_csv}")
+print(f"CSV generado con {len(archivos)} frames")
+print(f"Guardado en: {output_csv}")
