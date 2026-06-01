@@ -10,18 +10,21 @@ from datetime import datetime
 import numpy as np
  
 IS_WINDOWS = platform.system() == "Windows"
-IS_MAC     = platform.system() == "Darwin"
+IS_MAC = platform.system() == "Darwin"
  
-# ── Rutas del proyecto ──────────────────────────────────────────────────────
-WORKDIR    = Path(__file__).parent.parent.resolve()   # openpose-workdir/
-DATA_DIR   = WORKDIR / "data" / "raw"                 # videos originales
-OUTPUT_DIR = WORKDIR / "outputs"                      # resultados
+#Rutas del proyecto
+# openpose-workdir/
+WORKDIR = Path(__file__).parent.parent.resolve()
+# videos originales
+DATA_DIR = WORKDIR / "data" / "raw"
+ # resultados
+OUTPUT_DIR = WORKDIR / "outputs"
  
 for d in [DATA_DIR, OUTPUT_DIR]:
     d.mkdir(parents=True, exist_ok=True)
  
-# ── Docker ──────────────────────────────────────────────────────────────────
-DOCKER_IMAGE    = "openpose-local"
+#Docker
+DOCKER_IMAGE = "openpose-local"
 DOCKER_PLATFORM = "linux/amd64"
  
 def _docker_env():
@@ -75,7 +78,7 @@ def get_frame_count(video_path):
     try:
         import cv2
         cap = cv2.VideoCapture(str(video_path))
-        n   = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        n = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         fps = cap.get(cv2.CAP_PROP_FPS)
         cap.release()
         return (n if n > 0 else 300), (fps if fps > 0 else 30)
@@ -96,19 +99,19 @@ def run_openpose(video_path, output_dir, subject_id=None, progress_callback=None
     import threading
     video_path = Path(video_path)
     stem = video_path.stem.replace(" ", "_")
-    ts   = datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     name = f"{stem}_{ts}"
  
     # Carpeta de salida para este video
     folder_name = subject_id if subject_id else stem
-    run_dir  = Path(output_dir) / folder_name
+    run_dir = Path(output_dir) / folder_name
     json_dir = run_dir / "json"
     run_dir.mkdir(parents=True, exist_ok=True)
     json_dir.mkdir(parents=True, exist_ok=True)
  
-    label      = subject_id if subject_id else stem
-    avi_path   = run_dir / f"{label}_skeleton.avi"
-    mp4_path   = run_dir / "skeleton.mp4"
+    label = subject_id if subject_id else stem
+    avi_path = run_dir / f"{label}_skeleton.avi"
+    mp4_path = run_dir / "skeleton.mp4"
     excel_path = run_dir / "angles.xlsx"
     chart_path = run_dir / "charts.png"
  
@@ -180,19 +183,19 @@ def run_openpose(video_path, output_dir, subject_id=None, progress_callback=None
         print(f"[openpose_core] Warning al generar Excel: {e}")
  
     return {
-        "name":   stem,
-        "mp4":    str(mp4_path)    if mp4_path.exists()   else "",
-        "avi":    str(avi_path)    if avi_path.exists()   else "",
-        "excel":  str(excel_path)  if excel_path.exists() else "",
+        "name": stem,
+        "mp4": str(mp4_path)    if mp4_path.exists()   else "",
+        "avi": str(avi_path)    if avi_path.exists()   else "",
+        "excel": str(excel_path)  if excel_path.exists() else "",
         "charts": str(chart_path)  if chart_path.exists() else "",
-        "json":   str(json_dir),
+        "json": str(json_dir),
         "folder": str(run_dir),
         "frames": total_frames,
-        "fps":    fps,
-        "df":     df,
+        "fps": fps,
+        "df": df,
     }
  
-# ── Procesamiento de keypoints ───────────────────────────────────────────────
+#Procesamiento de keypoints
  
 def extract_point(keypoints, index):
     b = index * 3
@@ -212,14 +215,14 @@ def calc_angle(p1, p2, p3):
  
 # Articulaciones relevantes para ciclismo
 JOINT_MAP = {
-    "Rodilla D":  (9,  10, 11),
-    "Rodilla I":  (12, 13, 14),
-    "Cadera D":   (1,  9,  10),
-    "Cadera I":   (1,  12, 13),
-    "Codo D":     (2,  3,  4),
-    "Codo I":     (5,  6,  7),
-    "Hombro D":   (1,  2,  3),
-    "Hombro I":   (1,  5,  6),
+    "Rodilla D": (9,  10, 11),
+    "Rodilla I": (12, 13, 14),
+    "Cadera D": (1,  9,  10),
+    "Cadera I": (1,  12, 13),
+    "Codo D": (2,  3,  4),
+    "Codo I": (5,  6,  7),
+    "Hombro D": (1,  2,  3),
+    "Hombro I": (1,  5,  6),
 }
  
 def json_to_dataframe(json_dir, fps=30):
@@ -316,13 +319,13 @@ def open_path(path):
         subprocess.run(["open", target])
  
 if __name__ == "__main__":
-    print("=== openpose_core.py — Verificación del sistema ===\n")
+    print("openpose_core.py: Verificación del sistema\n")
     print(f"Sistema operativo: {platform.system()}")
     print(f"Carpeta de trabajo: {WORKDIR}")
-    print(f"Data raw:           {DATA_DIR}")
-    print(f"Outputs:            {OUTPUT_DIR}\n")
+    print(f"Data raw: {DATA_DIR}")
+    print(f"Outputs: {OUTPUT_DIR}\n")
     ok, msg = check_docker()
-    print(f"Docker: {'✓' if ok else '✗'} {msg}")
+    print(f"Docker: {'OKAY' if ok else 'ERROR'} {msg}")
     if ok:
         ok2, msg2 = check_openpose_image()
-        print(f"Imagen OpenPose: {'✓' if ok2 else '✗'} {msg2}")
+        print(f"Imagen OpenPose: {'OK' if ok2 else 'ERROR'} {msg2}")
