@@ -26,7 +26,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtGui import QColor, QFont, QLinearGradient, QPalette, QIcon, QPixmap
  
-# ── Paleta de colores ────────────────────────────────────────────────────────
+#colores
 C = {
     "bg":        "#0a0f14",
     "surface":   "#0d1520",
@@ -48,7 +48,7 @@ C = {
 }
  
 STYLE = f"""
-/* ── Base ── */
+/*Base*/
 QMainWindow, QWidget {{
     background-color: {C['bg']};
     color: {C['text']};
@@ -59,7 +59,7 @@ QLabel {{
     background: transparent;
 }}
  
-/* ── Botón primario ── */
+/*Botón primario*/
 QPushButton {{
     background-color: {C['accent']};
     color: {C['bg']};
@@ -82,7 +82,7 @@ QPushButton:disabled {{
     color: {C['text3']};
 }}
  
-/* ── Botón secundario ── */
+/*Botón secundario*/
 QPushButton#secondary {{
     background-color: transparent;
     color: {C['text2']};
@@ -94,7 +94,7 @@ QPushButton#secondary:hover {{
     border-color: {C['text3']};
 }}
  
-/* ── Botón abrir ── */
+/*Botón abrir*/
 QPushButton#open_btn {{
     background-color: transparent;
     color: {C['accent']};
@@ -109,7 +109,7 @@ QPushButton#open_btn:hover {{
     color: {C['bg']};
 }}
  
-/* ── Barra de progreso ── */
+/*Barra de progreso*/
 QProgressBar {{
     background-color: {C['surface3']};
     border: none;
@@ -127,7 +127,7 @@ QProgressBar::chunk {{
     border-radius: 3px;
 }}
  
-/* ── Lista de videos ── */
+/*Lista de videos*/
 QListWidget {{
     background-color: {C['surface']};
     border: 1px solid {C['border']};
@@ -154,7 +154,7 @@ QListWidget::item:hover {{
     color: {C['text']};
 }}
  
-/* ── Combo ── */
+/*Combo*/
 QComboBox {{
     background-color: {C['surface2']};
     border: 1px solid {C['border2']};
@@ -175,7 +175,7 @@ QComboBox::drop-down {{
     width: 20px;
 }}
  
-/* ── Scrollbar ── */
+/*Scrollbar*/
 QScrollBar:vertical {{
     background: transparent;
     width: 4px;
@@ -190,7 +190,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
     height: 0px;
 }}
  
-/* ── Cards ── */
+/*Cards*/
 QFrame#card {{
     background-color: {C['surface']};
     border: 1px solid {C['border']};
@@ -242,8 +242,8 @@ LANGS = {
     },
     "EN": {
         "app_title":      "Biomechanical Analysis · Cycling",
-        "subtitle":       "OpenPose · Universidad de los Andes",
-        "authors":        "Luis Nieto — Gabriela Osorio",
+        "subtitle":       "OpenPose - Universidad de los Andes",
+        "authors":        "Luis Nieto & Gabriela Osorio",
         "lang_label":     "Language",
         "add_videos":     "Add Videos",
         "clear_list":     "Clear",
@@ -271,7 +271,7 @@ LANGS = {
 }
  
  
-# ── Worker ───────────────────────────────────────────────────────────────────
+#Worker
 class AnalysisWorker(QThread):
     progress      = pyqtSignal(int, int)
     status_update = pyqtSignal(str)
@@ -298,7 +298,7 @@ class AnalysisWorker(QThread):
         self.all_done.emit()
  
  
-# ── Drop list ────────────────────────────────────────────────────────────────
+#Drop list
 class DropList(QListWidget):
     files_dropped = pyqtSignal(list)
  
@@ -324,7 +324,7 @@ class DropList(QListWidget):
             self.files_dropped.emit(paths)
  
  
-# ── Etiqueta de estado con punto de color ────────────────────────────────────
+#Etiqueta de estado con punto de color
 class StatusBar(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -346,7 +346,7 @@ class StatusBar(QWidget):
         self.label.setText(text)
  
  
-# ── Card de resultado ────────────────────────────────────────────────────────
+#Card de resultado
 class ResultCard(QFrame):
     def __init__(self, result, lang="ES", parent=None):
         super().__init__(parent)
@@ -427,7 +427,7 @@ class ResultCard(QFrame):
             lay.addLayout(row)
  
  
-# ── Ventana principal ────────────────────────────────────────────────────────
+#Ventana principal
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -446,7 +446,7 @@ class MainWindow(QMainWindow):
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
  
-        # ── Sidebar izquierdo ─────────────────────────────────────────────
+        #Sidebar izquierdo
         sidebar = QFrame()
         sidebar.setObjectName("sidebar")
         sidebar.setFixedWidth(360)
@@ -454,7 +454,7 @@ class MainWindow(QMainWindow):
         sv.setContentsMargins(24, 28, 24, 24)
         sv.setSpacing(0)
  
-        # Logo / título
+        # Logo y título
         logo_row = QHBoxLayout()
         dot1 = QLabel("◆")
         dot1.setStyleSheet(f"color: {C['accent']}; font-size: 14px;")
@@ -516,7 +516,7 @@ class MainWindow(QMainWindow):
         sv.addWidget(self.hint_lbl)
         sv.addSpacing(10)
  
-        # Botones agregar / limpiar
+        #Botones agregar/ limpiar
         btn_row = QHBoxLayout()
         btn_row.setSpacing(8)
         self.add_btn = QPushButton()
@@ -533,7 +533,7 @@ class MainWindow(QMainWindow):
         sv.addWidget(self._divider())
         sv.addSpacing(18)
  
-        # Progreso
+        #Progreso
         self.progress_lbl = QLabel()
         self.progress_lbl.setStyleSheet(
             f"color: {C['text3']}; font-size: 9px; font-weight: 700; letter-spacing: 1.5px;"
@@ -557,7 +557,7 @@ class MainWindow(QMainWindow):
         sv.addWidget(self.status_bar)
         sv.addSpacing(18)
  
-        # Botón analizar
+        #Botón analizar
         self.analyze_btn = QPushButton()
         self.analyze_btn.setFixedHeight(44)
         self.analyze_btn.setStyleSheet(f"""
@@ -590,7 +590,7 @@ class MainWindow(QMainWindow):
         sv.addWidget(self.analyze_btn)
         sv.addStretch()
  
-        # Footer
+        #Footer
         self.authors_lbl = QLabel()
         self.authors_lbl.setStyleSheet(f"color: {C['text3']}; font-size: 9px;")
         self.authors_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -598,7 +598,7 @@ class MainWindow(QMainWindow):
  
         root.addWidget(sidebar)
  
-        # ── Panel derecho ─────────────────────────────────────────────────
+        #Panel derecho
         right = QWidget()
         right.setStyleSheet(f"background-color: {C['bg']};")
         rv = QVBoxLayout(right)
@@ -736,7 +736,7 @@ class MainWindow(QMainWindow):
         self.progress_bar.setValue(0)
         self.status_bar.set(t["status_running"], C["warn"])
  
-        # Ocultar placeholder
+        #Ocultar placeholder
         self.empty_lbl.hide()
  
         self.worker = AnalysisWorker(paths)
@@ -782,7 +782,7 @@ class MainWindow(QMainWindow):
         dialog.exec()
  
  
-# ── Entry point ──────────────────────────────────────────────────────────────
+#Entry point
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationName("OpenPose Biomechanics · Ciclismo")
